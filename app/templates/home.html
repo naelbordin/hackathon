@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conseiller RNCP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <div class="hero-text">
+          <p class="eyebrow">Conseiller RNCP</p>
+          <h1>Trouvez la fiche idéale pour un stage</h1>
+          <p class="sub">Choisissez votre mode de recherche.</p>
+        </div>
+        <div class="hero-panel">
+          <div class="progress">
+            <span class="label">Mode</span>
+            <span class="value">Sélection</span>
+            <div class="bar">
+              <span style="width: 50%"></span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <section class="choice-grid">
+        <a class="choice-card" href="{{ url_for('chat', role='apprenant') }}">
+          <h2>Apprenant</h2>
+          <p>Coaching carrière : reformulation, compétences et matching RNCP.</p>
+          <span class="choice-cta">Commencer</span>
+        </a>
+        <a class="choice-card muted" href="{{ url_for('chat', role='ecole') }}">
+          <h2>École</h2>
+          <p>Réserver un espace : conformité RNCP et missions pédagogiques.</p>
+          <span class="choice-cta">Espace réservé</span>
+        </a>
+        <a class="choice-card muted" href="{{ url_for('chat', role='employeur') }}">
+          <h2>Employeur</h2>
+          <p>Clarifier l’offre et identifier les profils compatibles.</p>
+          <span class="choice-cta">Espace réservé</span>
+        </a>
+        <a class="choice-card" href="{{ url_for('resume') }}">
+          <h2>Importer un CV</h2>
+          <p>Analyse automatique du CV et matching RNCP.</p>
+          <span class="choice-cta">Importer</span>
+        </a>
+      </section>
+    </main>
+  </body>
+</html>
