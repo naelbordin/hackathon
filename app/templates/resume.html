@@ -64,7 +64,12 @@
               <article class="card">
                 <div class="card-head">
                   <h3>{{ fiche.intitule or fiche.numero }}</h3>
-                  <span class="badge">{{ fiche.numero }}</span>
+                  {% set rncp_link = fiche.numero|rncp_url %}
+                  {% if rncp_link %}
+                    <a class="badge" href="{{ rncp_link }}" target="_blank" rel="noopener noreferrer">{{ fiche.numero }}</a>
+                  {% else %}
+                    <span class="badge">{{ fiche.numero }}</span>
+                  {% endif %}
                 </div>
                 <div class="meta">
                   {% if fiche.niveau_intitule %}<span>{{ fiche.niveau_intitule }}</span>{% endif %}
@@ -99,7 +104,12 @@
             <article class="card">
               <div class="card-head">
                 <h3>{{ fiche.intitule or fiche.numero }}</h3>
-                <span class="badge">{{ fiche.numero }}</span>
+                {% set rncp_link = fiche.numero|rncp_url %}
+                {% if rncp_link %}
+                  <a class="badge" href="{{ rncp_link }}" target="_blank" rel="noopener noreferrer">{{ fiche.numero }}</a>
+                {% else %}
+                  <span class="badge">{{ fiche.numero }}</span>
+                {% endif %}
               </div>
               <div class="meta">
                 {% if fiche.niveau_intitule %}<span>{{ fiche.niveau_intitule }}</span>{% endif %}

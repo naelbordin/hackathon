@@ -288,6 +288,17 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret")
 
 
+@app.template_filter("rncp_url")
+def rncp_url(code: str) -> str:
+    if not code:
+        return ""
+    text = normalize_text(code)
+    m = re.search(r"([a-z]+)[^a-z0-9]*([0-9]+)", text)
+    if not m:
+        return ""
+    return f"https://www.francecompetences.fr/recherche/{m.group(1)}/{m.group(2)}/"
+
+
 def init_spacy() -> bool:
     global NLP, SPACY_READY, SPACY_STOPWORDS, DOMAIN_LEMMA_TOKENS
     if SPACY_READY:
