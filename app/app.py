@@ -9,10 +9,11 @@ from collections import Counter
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
 
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, send_from_directory, session
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "export-fiches-csv-2026-02-02"))
+ADS_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "ads"))
 
 STOPWORDS_FR = {
     "a", "au", "aux", "avec", "ce", "ces", "dans", "de", "des", "du", "elle",
@@ -286,6 +287,11 @@ for numero, fiche in FICHES.items():
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret")
+
+
+@app.route("/ads/<path:filename>")
+def ads(filename: str):
+    return send_from_directory(ADS_DIR, filename)
 
 
 @app.template_filter("rncp_url")

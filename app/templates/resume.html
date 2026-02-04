@@ -7,7 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body>
-    <main class="container">
+    <div class="page">
+      <aside class="side-ad" aria-label="Publicité">
+        <img src="{{ url_for('ads', filename='fv-ad.png') }}" alt="Publicité" />
+      </aside>
+      <main class="container">
       <header class="hero">
         <div class="hero-text">
           <p class="eyebrow">SkillBridge</p>
@@ -128,7 +132,8 @@
         {% endif %}
       </section>
       {% endif %}
-    </main>
+      </main>
+    </div>
     <div class="loading" id="loading">
       <div class="loading-card">
         <div class="spinner"></div>

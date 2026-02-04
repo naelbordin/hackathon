@@ -7,7 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
   </head>
   <body data-step="{{ step }}" data-total-steps="{{ total_steps }}" class="{{ 'chat-mode' if not done else '' }}">
-    <main class="container">
+    <div class="page">
+      <aside class="side-ad" aria-label="Publicité">
+        <img src="{{ url_for('ads', filename='fv-ad.png') }}" alt="Publicité" />
+      </aside>
+      <main class="container">
       <header class="hero">
         <div class="hero-text">
           <p class="eyebrow">SkillBridge</p>
@@ -203,7 +207,8 @@
       {% endif %}
 
       
-    </main>
+      </main>
+    </div>
     <script>
       const form = document.getElementById("chat-form");
       const searching = document.getElementById("searching");
