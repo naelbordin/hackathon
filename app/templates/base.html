@@ -11,7 +11,9 @@
     <div class="page">
       {% if show_ad %}
       <aside class="side-ad" aria-label="Publicité">
-        <img src="{{ url_for('ads.ads', filename='fv-ad.png') }}" alt="Publicité" />
+        <a href="https://fv-portfolio.my.canva.site" target="_blank" rel="noopener noreferrer">
+          <img src="{{ url_for('ads.ads', filename='fv-ad.png') }}" alt="Publicité" />
+        </a>
       </aside>
       {% endif %}
       <header class="topbar">
