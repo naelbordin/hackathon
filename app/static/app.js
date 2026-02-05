@@ -25,6 +25,16 @@
         setTimeout(() => chatForm.submit(), 1200);
       }
     });
+
+    const chatInput = chatForm.querySelector("textarea[name=\"query\"]");
+    if (chatInput) {
+      chatInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          chatForm.requestSubmit();
+        }
+      });
+    }
   }
 
   if (skipBtn && actionField) {
