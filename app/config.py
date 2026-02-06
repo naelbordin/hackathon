@@ -9,6 +9,8 @@ class Config:
     SECRET_KEY: str
     DATA_DIR: str
     ADS_DIR: str
+    STUDENTS_CSV: str
+    COMPANIES_CSV: str
     DEBUG: bool = False
     MAX_CONTENT_LENGTH: int = 8 * 1024 * 1024
 
@@ -28,9 +30,24 @@ def load_config() -> Config:
     base_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.abspath(os.path.join(base_dir, "..", "export-fiches-csv-2026-02-02"))
     ads_dir = os.path.abspath(os.path.join(base_dir, "..", "ads"))
+    registry_dir = os.path.abspath(os.path.join(base_dir, "data"))
+    students_csv = os.path.join(registry_dir, "students.csv")
+    companies_csv = os.path.join(registry_dir, "companies.csv")
 
     env = os.environ.get("FLASK_ENV", "production").lower()
     if env == "development":
-        return DevConfig(SECRET_KEY=secret, DATA_DIR=data_dir, ADS_DIR=ads_dir)
+        return DevConfig(
+            SECRET_KEY=secret,
+            DATA_DIR=data_dir,
+            ADS_DIR=ads_dir,
+            STUDENTS_CSV=students_csv,
+            COMPANIES_CSV=companies_csv,
+        )
 
-    return Config(SECRET_KEY=secret, DATA_DIR=data_dir, ADS_DIR=ads_dir)
+    return Config(
+        SECRET_KEY=secret,
+        DATA_DIR=data_dir,
+        ADS_DIR=ads_dir,
+        STUDENTS_CSV=students_csv,
+        COMPANIES_CSV=companies_csv,
+    )

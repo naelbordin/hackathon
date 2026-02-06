@@ -11,6 +11,7 @@ from routes.ads import ads_bp
 from routes.chat import chat_bp
 from routes.home import home_bp
 from routes.resume import resume_bp
+from routes.students import students_bp
 from services.store import register_template_filters
 
 
@@ -55,6 +56,7 @@ app.register_blueprint(chat_bp)
 app.register_blueprint(resume_bp)
 app.register_blueprint(about_bp)
 app.register_blueprint(ads_bp)
+app.register_blueprint(students_bp)
 
 register_error_handlers(app)
 

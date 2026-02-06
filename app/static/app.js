@@ -16,8 +16,9 @@
   if (chatForm) {
     const step = parseInt(document.body.dataset.step || "0", 10);
     const totalSteps = parseInt(document.body.dataset.totalSteps || "0", 10);
+    const role = document.body.dataset.role || "none";
     chatForm.addEventListener("submit", (event) => {
-      if (step === totalSteps - 1) {
+      if (role !== "none" && step === totalSteps - 1) {
         event.preventDefault();
         if (searching) {
           searching.classList.add("active");

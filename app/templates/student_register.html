@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% set body_class = "register" %}
+
+{% block title %}SkillBridge · Inscription Étudiant{% endblock %}
+
+{% block content %}
+<section class="hero hero-register">
+  <div class="hero-copy">
+    <p class="eyebrow">Inscription Étudiant</p>
+    <h1>Créez un profil visible par les entreprises.</h1>
+    <p class="sub">Les informations saisies seront ajoutées à la base de recherche.</p>
+  </div>
+  <div class="hero-panel">
+    <h2>Conseils rapides</h2>
+    <ul class="hero-list">
+      <li>Indiquez un poste clair et un domaine précis.</li>
+      <li>Listez vos compétences clés séparées par “;”.</li>
+      <li>Ajoutez un lien portfolio si possible.</li>
+    </ul>
+    <a class="link-arrow" href="{{ url_for('chat.chat') }}">Lancer l’assistant</a>
+  </div>
+</section>
+
+<section class="form-card">
+  <h2>Formulaire</h2>
+  {% if success %}
+    <div class="alert success">Inscription enregistrée. Merci !</div>
+  {% endif %}
+  {% if errors %}
+    <div class="alert error">
+      {% for err in errors %}
+        <p>{{ err }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" class="form-grid">
+    <label class="field">
+      <span>Nom complet *</span>
+      <input type="text" name="nom" value="{{ form.nom }}" required />
+    </label>
+    <label class="field">
+      <span>Email *</span>
+      <input type="email" name="email" value="{{ form.email }}" required />
+    </label>
+    <label class="field">
+      <span>École *</span>
+      <input type="text" name="ecole" value="{{ form.ecole }}" required />
+    </label>
+    <label class="field">
+      <span>Niveau *</span>
+      <input type="text" name="niveau" placeholder="ex: Bac+3 / Niveau 6" value="{{ form.niveau }}" required />
+    </label>
+    <label class="field">
+      <span>Domaine</span>
+      <input type="text" name="domaine" value="{{ form.domaine }}" />
+    </label>
+    <label class="field">
+      <span>Poste recherché</span>
+      <input type="text" name="poste" value="{{ form.poste }}" />
+    </label>
+    <label class="field">
+      <span>Compétences clés</span>
+      <textarea name="competences" rows="3" placeholder="ex: React ; UX ; Figma">{{ form.competences }}</textarea>
+    </label>
+    <label class="field">
+      <span>Ville</span>
+      <input type="text" name="ville" value="{{ form.ville }}" />
+    </label>
+    <label class="field">
+      <span>Disponibilité</span>
+      <input type="text" name="disponibilite" value="{{ form.disponibilite }}" />
+    </label>
+    <label class="field">
+      <span>Portfolio / LinkedIn</span>
+      <input type="text" name="portfolio" value="{{ form.portfolio }}" />
+    </label>
+    <div class="actions">
+      <button type="submit" class="button primary">Enregistrer</button>
+      <a class="button ghost" href="{{ url_for('home.home') }}">Retour accueil</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

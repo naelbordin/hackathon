@@ -1,16 +1,20 @@
 {% extends "base.html" %}
 {% set body_class = "chat" %}
-{% set body_data = {"step": step, "total-steps": total_steps} %}
+{% set body_data = {"step": step, "total-steps": total_steps, "role": role or "none"} %}
 {% set show_ad = true %}
 
 {% block title %}SkillBridge · Assistant{% endblock %}
 
 {% block content %}
+{% set role_labels = {"etudiant": "Étudiant", "entreprise": "Entreprise"} %}
+{% set role_label = role_labels.get(role, "Sélection profil") %}
+{% set target_label = "Fiches RNCP" if role == "etudiant" else ("Étudiants" if role == "entreprise" else "Étudiants ou fiches RNCP") %}
+
 <section class="hero hero-assistant">
   <div class="hero-copy">
-    <p class="eyebrow">Assistant RNCP</p>
-    <h1>Orientez un étudiant vers les fiches les plus pertinentes.</h1>
-    <p class="sub">Un dialogue court pour affiner poste, domaine et compétences clés.</p>
+    <p class="eyebrow">Assistant de mise en relation</p>
+    <h1>Trouvez {{ target_label | lower }} en quelques questions.</h1>
+    <p class="sub">Un dialogue court pour préciser poste, domaine et compétences clés.</p>
     <div class="progress-card">
       <div>
         <span class="progress-label">Progression</span>
@@ -19,7 +23,7 @@
       <div class="progress-bar">
         <span style="width: {{ ((step if step < total_steps else total_steps) / total_steps) * 100 }}%"></span>
       </div>
-      <span class="role-pill">{{ role }}</span>
+      <span class="role-pill">{{ role_label }}</span>
     </div>
   </div>
   <div class="hero-panel">
@@ -58,7 +62,7 @@
       <div class="avatar">SB</div>
       <div class="bubble">
         <span class="label">Conseiller</span>
-        <p>Je recherche les meilleures fiches…</p>
+        <p>Je recherche les {{ target_label | lower }}…</p>
         <div class="dots"><span></span><span></span><span></span></div>
       </div>
     </div>
@@ -72,7 +76,9 @@
       <input type="hidden" name="action" id="action-field" value="send" />
       <div class="actions">
         <button type="submit" class="button primary">{{ "Continuer" if step < total_steps else "Relancer une recherche" }}</button>
-        <button type="submit" class="button ghost" id="skip-btn">Passer cette question</button>
+        {% if role %}
+          <button type="submit" class="button ghost" id="skip-btn">Passer cette question</button>
+        {% endif %}
       </div>
     </form>
     {% endif %}
@@ -92,7 +98,11 @@
 <section class="keywords">
   <h2>Critères retenus</h2>
   <div class="criteria-grid">
-    {% set labels = {"job_title": "Poste", "domaine": "Domaine", "competences": "Compétences", "niveau": "Niveau", "rome": "ROME", "formacode": "Formacode"} %}
+    {% if result_type == "rncp" %}
+      {% set labels = {"job_title": "Poste", "domaine": "Domaine", "competences": "Compétences", "niveau": "Niveau", "rome": "ROME", "formacode": "Formacode"} %}
+    {% else %}
+      {% set labels = {"poste": "Poste", "domaine": "Domaine", "competences": "Compétences", "niveau": "Niveau", "ecole": "École", "localisation": "Localisation"} %}
+    {% endif %}
     {% for cat, k in keywords %}
       <div class="criteria-card">
         <span class="criteria-label">{{ labels.get(cat, cat) }}</span>
@@ -117,64 +127,15 @@
     <div class="result-group">
       <h3>Correspondances fortes</h3>
       {% set nb = namespace(has_best=false) %}
-      {% for fiche, score, matched, matched_count, expected in results %}
-        {% if matched_count == expected %}
-          {% set nb.has_best = true %}
-          <article class="card">
-            <div class="card-head">
-              <h3>{{ fiche.intitule or fiche.numero }}</h3>
-              {% set rncp_link = fiche.numero|rncp_url %}
-              {% if rncp_link %}
-                <a class="badge" href="{{ rncp_link }}" target="_blank" rel="noopener noreferrer">{{ fiche.numero }}</a>
-              {% else %}
-                <span class="badge">{{ fiche.numero }}</span>
-              {% endif %}
-            </div>
-            <div class="meta">
-              {% if fiche.niveau_intitule %}<span>{{ fiche.niveau_intitule }}</span>{% endif %}
-              {% if fiche.actif %}<span>Statut: {{ fiche.actif }}</span>{% endif %}
-              <span>Score: {{ score }}</span>
-            </div>
-            {% if fiche.rome_labels %}
-              <p><strong>ROME:</strong> {{ fiche.rome_labels|join(', ') }}</p>
-            {% endif %}
-            {% if fiche.formacode_labels %}
-              <p><strong>Formacode:</strong> {{ fiche.formacode_labels|join(', ') }}</p>
-            {% endif %}
-            {% if fiche.blocs %}
-              <details>
-                <summary>Blocs de compétences</summary>
-                <ul>
-                  {% for b in fiche.blocs %}<li>{{ b }}</li>{% endfor %}
-                </ul>
-              </details>
-            {% endif %}
-            {% if matched %}
-              <div class="tags">
-                {% for m in matched %}<span class="tag">{{ m }}</span>{% endfor %}
-              </div>
-            {% endif %}
-          </article>
-        {% endif %}
-      {% endfor %}
-      {% if not nb.has_best %}
-        <p class="empty">Aucune correspondance exacte. Essayez d’élargir un critère.</p>
-      {% endif %}
-    </div>
-
-    {% set ns = namespace(has_less=false) %}
-    <div class="result-group">
-      {% for fiche, score, matched, matched_count, expected in results %}
-        {% if matched_count < expected %}
-          {% set ns.has_less = true %}
-        {% endif %}
-      {% endfor %}
-      {% if ns.has_less %}
-        <button type="button" class="toggle" id="toggle-less">Explorer des pistes proches</button>
-      {% endif %}
-      <div class="less-results" id="less-results">
-        {% for fiche, score, matched, matched_count, expected in results %}
-          {% if matched_count < expected %}
+      {% for result in results %}
+        {% if result_type == "rncp" %}
+          {% set fiche = result[0] %}
+          {% set score = result[1] %}
+          {% set matched = result[2] %}
+          {% set matched_count = result[3] %}
+          {% set expected = result[4] %}
+          {% if matched_count == expected %}
+            {% set nb.has_best = true %}
             <article class="card">
               <div class="card-head">
                 <h3>{{ fiche.intitule or fiche.numero }}</h3>
@@ -210,6 +171,179 @@
                 </div>
               {% endif %}
             </article>
+          {% endif %}
+        {% else %}
+          {% if result.matched_count == result.expected %}
+            {% set nb.has_best = true %}
+            {% if result_type == "companies" %}
+              <article class="card">
+                <div class="card-head">
+                  <h3>{{ result.row.get("nom", "Entreprise") }}</h3>
+                  {% if result.row.get("secteur") %}
+                    <span class="badge">{{ result.row.get("secteur") }}</span>
+                  {% endif %}
+                </div>
+                <div class="meta">
+                  {% if result.row.get("poste") %}<span>Poste: {{ result.row.get("poste") }}</span>{% endif %}
+                  {% if result.row.get("ville") %}<span>Ville: {{ result.row.get("ville") }}</span>{% endif %}
+                  {% if result.row.get("site") %}<span>Site: {{ result.row.get("site") }}</span>{% endif %}
+                </div>
+                {% if result.row.get("competences") %}
+                  <p><strong>Compétences:</strong> {{ result.row.get("competences") }}</p>
+                {% endif %}
+                {% if result.row.get("description") %}
+                  <p>{{ result.row.get("description") }}</p>
+                {% endif %}
+                {% if result.matched %}
+                  <div class="tags">
+                    {% for m in result.matched %}<span class="tag">{{ m }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              </article>
+            {% else %}
+              <article class="card">
+                <div class="card-head">
+                  <h3>{{ result.row.get("nom", "Étudiant") }}</h3>
+                  {% if result.row.get("niveau") %}
+                    <span class="badge">{{ result.row.get("niveau") }}</span>
+                  {% endif %}
+                </div>
+                <div class="meta">
+                  {% if result.row.get("poste") %}<span>Poste: {{ result.row.get("poste") }}</span>{% endif %}
+                  {% if result.row.get("ecole") %}<span>École: {{ result.row.get("ecole") }}</span>{% endif %}
+                  {% if result.row.get("ville") %}<span>Ville: {{ result.row.get("ville") }}</span>{% endif %}
+                </div>
+                {% if result.row.get("competences") %}
+                  <p><strong>Compétences:</strong> {{ result.row.get("competences") }}</p>
+                {% endif %}
+                {% if result.row.get("portfolio") %}
+                  <p><strong>Portfolio:</strong> {{ result.row.get("portfolio") }}</p>
+                {% endif %}
+                {% if result.row.get("email") %}
+                  <p><strong>Contact:</strong> {{ result.row.get("email") }}</p>
+                {% endif %}
+                {% if result.matched %}
+                  <div class="tags">
+                    {% for m in result.matched %}<span class="tag">{{ m }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              </article>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% if not nb.has_best %}
+        <p class="empty">Aucune correspondance exacte. Essayez d’élargir un critère.</p>
+      {% endif %}
+    </div>
+
+    {% set ns = namespace(has_less=false) %}
+    <div class="result-group">
+      {% for result in results %}
+        {% if result_type == "rncp" %}
+          {% if result[3] < result[4] %}
+            {% set ns.has_less = true %}
+          {% endif %}
+        {% else %}
+          {% if result.matched_count < result.expected %}
+            {% set ns.has_less = true %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% if ns.has_less %}
+        <button type="button" class="toggle" id="toggle-less">Explorer des pistes proches</button>
+      {% endif %}
+      <div class="less-results" id="less-results">
+        {% for result in results %}
+          {% if result_type == "rncp" %}
+            {% set fiche = result[0] %}
+            {% set score = result[1] %}
+            {% set matched = result[2] %}
+            {% set matched_count = result[3] %}
+            {% set expected = result[4] %}
+            {% if matched_count < expected %}
+              <article class="card">
+                <div class="card-head">
+                  <h3>{{ fiche.intitule or fiche.numero }}</h3>
+                  {% set rncp_link = fiche.numero|rncp_url %}
+                  {% if rncp_link %}
+                    <a class="badge" href="{{ rncp_link }}" target="_blank" rel="noopener noreferrer">{{ fiche.numero }}</a>
+                  {% else %}
+                    <span class="badge">{{ fiche.numero }}</span>
+                  {% endif %}
+                </div>
+                <div class="meta">
+                  {% if fiche.niveau_intitule %}<span>{{ fiche.niveau_intitule }}</span>{% endif %}
+                  {% if fiche.actif %}<span>Statut: {{ fiche.actif }}</span>{% endif %}
+                  <span>Score: {{ score }}</span>
+                </div>
+                {% if fiche.rome_labels %}
+                  <p><strong>ROME:</strong> {{ fiche.rome_labels|join(', ') }}</p>
+                {% endif %}
+                {% if fiche.formacode_labels %}
+                  <p><strong>Formacode:</strong> {{ fiche.formacode_labels|join(', ') }}</p>
+                {% endif %}
+                {% if fiche.blocs %}
+                  <details>
+                    <summary>Blocs de compétences</summary>
+                    <ul>
+                      {% for b in fiche.blocs %}<li>{{ b }}</li>{% endfor %}
+                    </ul>
+                  </details>
+                {% endif %}
+                {% if matched %}
+                  <div class="tags">
+                    {% for m in matched %}<span class="tag">{{ m }}</span>{% endfor %}
+                  </div>
+                {% endif %}
+              </article>
+            {% endif %}
+          {% else %}
+            {% if result.matched_count < result.expected %}
+              {% if result_type == "companies" %}
+                <article class="card">
+                  <div class="card-head">
+                    <h3>{{ result.row.get("nom", "Entreprise") }}</h3>
+                    {% if result.row.get("secteur") %}
+                      <span class="badge">{{ result.row.get("secteur") }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="meta">
+                    {% if result.row.get("poste") %}<span>Poste: {{ result.row.get("poste") }}</span>{% endif %}
+                    {% if result.row.get("ville") %}<span>Ville: {{ result.row.get("ville") }}</span>{% endif %}
+                  </div>
+                  {% if result.row.get("competences") %}
+                    <p><strong>Compétences:</strong> {{ result.row.get("competences") }}</p>
+                  {% endif %}
+                  {% if result.matched %}
+                    <div class="tags">
+                      {% for m in result.matched %}<span class="tag">{{ m }}</span>{% endfor %}
+                    </div>
+                  {% endif %}
+                </article>
+              {% else %}
+                <article class="card">
+                  <div class="card-head">
+                    <h3>{{ result.row.get("nom", "Étudiant") }}</h3>
+                    {% if result.row.get("niveau") %}
+                      <span class="badge">{{ result.row.get("niveau") }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="meta">
+                    {% if result.row.get("poste") %}<span>Poste: {{ result.row.get("poste") }}</span>{% endif %}
+                    {% if result.row.get("ecole") %}<span>École: {{ result.row.get("ecole") }}</span>{% endif %}
+                  </div>
+                  {% if result.row.get("competences") %}
+                    <p><strong>Compétences:</strong> {{ result.row.get("competences") }}</p>
+                  {% endif %}
+                  {% if result.matched %}
+                    <div class="tags">
+                      {% for m in result.matched %}<span class="tag">{{ m }}</span>{% endfor %}
+                    </div>
+                  {% endif %}
+                </article>
+              {% endif %}
+            {% endif %}
           {% endif %}
         {% endfor %}
       </div>

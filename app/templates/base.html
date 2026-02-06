@@ -20,19 +20,20 @@
         <a class="logo" href="{{ url_for('home.home') }}">SkillBridge</a>
         <nav class="nav">
           <a href="{{ url_for('home.home') }}" class="nav-link">Accueil</a>
-          <a href="{{ url_for('chat.chat', role='apprenant') }}" class="nav-link">Assistant</a>
+          <a href="{{ url_for('chat.chat') }}" class="nav-link">Assistant</a>
+          <a href="{{ url_for('students.register') }}" class="nav-link">Inscription Étudiant</a>
           <a href="{{ url_for('resume.resume') }}" class="nav-link">Analyse CV</a>
           <a href="{{ url_for('about.about') }}" class="nav-link">À propos</a>
         </nav>
         <div class="nav-cta">
-          <a class="button ghost" href="{{ url_for('chat.chat', role='apprenant') }}">Démarrer</a>
+          <a class="button ghost" href="{{ url_for('chat.chat') }}">Démarrer</a>
         </div>
       </header>
       <main class="container">
         {% block content %}{% endblock %}
       </main>
       <footer class="footer">
-        <p>SkillBridge · RNCP matching intelligent · 2026</p>
+        <p>SkillBridge · Matching étudiants / entreprises · 2026</p>
       </footer>
     </div>
     <script src="{{ url_for('static', filename='app.js') }}"></script>

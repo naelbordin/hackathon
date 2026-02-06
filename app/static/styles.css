@@ -524,6 +524,75 @@ body {
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
 }
 
+.form-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 16px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field span {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2);
+}
+
+.alert {
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 14px;
+  box-shadow: var(--shadow-soft);
+}
+
+.alert.success {
+  background: #e8f5f0;
+  border: 1px solid #cfe9df;
+  color: #0f6b5d;
+}
+
+.alert.error {
+  background: #fbeeee;
+  border: 1px solid #f0caca;
+  color: #9a2b2b;
+}
+
 .actions {
   display: flex;
   gap: 12px;
