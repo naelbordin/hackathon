@@ -3,14 +3,16 @@ SkillBridge — résumé technique du projet
 Architecture
 - Application web Flask structurée par blueprints :
   - / : page d’accueil
-  - /chat : assistant conversationnel RNCP
+  - /chat : assistant conversationnel (parcours étudiant / entreprise)
   - /resume : analyse de CV PDF
+  - /etudiants/inscription : formulaire d’inscription étudiant
   - /about : page de contexte
 - Routes : app/routes
-- Services : app/services (store + extraction PDF)
+- Services : app/services (store RNCP + recherche CSV + extraction PDF)
 - Templates Jinja2 : app/templates (base, home, index, resume, about, error)
 - UI : app/static/styles.css + app/static/app.js
 - Données RNCP chargées depuis CSV : export-fiches-csv-2026-02-02/
+- Profils étudiants stockés en CSV : app/data/students.csv
 
 Données et indexation
 - Chargement CSV (standard, ROME, Formacode, blocs de compétences).
@@ -22,10 +24,11 @@ Données et indexation
 - Préchargement au démarrage pour éviter un temps de latence lors du premier accès.
 
 Recherche
-- Les requêtes sont découpées par catégorie et filtrées par vocabulaire métier.
+- Parcours étudiant : recherche RNCP (CSV officiels) sur poste, domaine, compétences, niveau.
+- Parcours entreprise : recherche de profils étudiants dans app/data/students.csv.
+- Les requêtes sont découpées par catégorie et filtrées par vocabulaire métier (RNCP).
 - Scoring basé sur occurrences et correspondances exactes par catégorie.
-- Tri selon ratio de correspondance, score brut, statut actif et niveau.
-- Fallback : résultats “possibles” si peu de correspondances exactes.
+- Tri selon ratio de correspondance, score brut, statut actif et niveau (RNCP).
 
 Analyse CV
 - Extraction texte PDF via pdfplumber (fallback PyPDF2).
@@ -38,9 +41,10 @@ NLP léger (optionnel)
 - Fallback automatique vers l’heuristique si le modèle n’est pas disponible.
 
 UI
-- Affichage par groupes : correspondances fortes + correspondances possibles.
+- Affichage par groupes : correspondances fortes + pistes proches.
 - Badge RNCP cliquable vers France Compétences via filtre rncp_url.
-- Navigation multi-pages (accueil, assistant, CV, à propos).
+- Critères retenus affichés sous forme de cartes.
+- Navigation multi-pages (accueil, assistant, CV, inscription, à propos).
 
 Dépendances
 - Flask
