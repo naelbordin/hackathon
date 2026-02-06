@@ -58,3 +58,4 @@ app/
 export-fiches-csv-2026-02-02/
 requirements.txt
 ```
+
